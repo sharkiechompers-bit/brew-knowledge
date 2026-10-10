@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Brew Knowledge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Itim&family=Pixelify+Sans:wght@500&display=swap" rel="stylesheet">
+
+  <style>
+    :root { --letterbox: #1b1410; }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--letterbox);
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    img {
+      image-rendering: pixelated;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    button { font: inherit; }
+
+    /* ---------- Screens ---------- */
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .6s ease, visibility 0s linear .6s;
+    }
+    .screen.active {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity .6s ease;
+    }
+
+    /* Keeps each screen's artwork at its original proportions so
+       everything lines up on phones and desktops alike. */
+    .stage {
+      position: relative;
+      aspect-ratio: var(--w) / var(--h);
+      width: min(100vw, calc(100vh * var(--w) / var(--h)));
+      width: min(100vw, calc(100dvh * var(--w) / var(--h)));
+      container-type: inline-size;
+      overflow: hidden;
+    }
+
+    .bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Full-screen fade used when leaving for another page */
+    #fade {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .5s ease;
+      z-index: 999;
+    }
+    #fade.on { opacity: 1; pointer-events: all; }
+
+    /* ---------- Outside: the door ---------- */
+    .door {
+      position: absolute;
+      left: 4%;
+      top: 64%;
+      width: 33%;
+      height: 35%;
+      border: 0;
+      border-radius: 8% 8% 0 0;
+      background: transparent;
+      cursor: pointer;
+      animation: door-hint 2.4s ease-in-out infinite;
+      transition: background .2s;
+    }
+    .door:hover,
+    .door:focus-visible {
+      background: rgba(255, 232, 160, .16);
+      outline: none;
+    }
+    .door.knocking { animation: knock .18s ease-in-out 4; }
+
+    @keyframes door-hint {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 232, 160, 0); }
+      50%      { box-shadow: 0 0 3cqw .6cqw rgba(255, 232, 160, .45); }
+    }
+    @keyframes knock {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(.5cqw); }
+    }
+
+    /* ---------- Inside: clickable items ---------- */
+    .item {
+      position: absolute;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .item img {
+      display: block;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
+    .item:hover,
+    .item:focus-visible {
+      transform: translateY(-1.2cqw) scale(1.04);
+      filter: drop-shadow(0 .8cqw 0 rgba(0, 0, 0, .25));
+      outline: none;
+    }
+    .item:active,
+    .item.poke { transform: scale(.95); }
+
+    /* Positions are percentages of the 707 x 1000 inside artwork */
+    .logo   { left: 2%;    top: 4%;    width: 40%;   }
+    .menu   { left: 19%;   top: 37%;   width: 20%;   }
+    .coffee { left: 64%;   top: 47.5%; width: 15.5%; }
+    .gourdy { left: .7%;   top: 73%;   width: 26%;   }
+    .disk   { left: 70.5%; top: 78%;   width: 25.5%; }
+
+    /* ---------- Pink windows (Welcome + Menu) ---------- */
+    .window {
+      position: absolute;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+    }
+    .window[hidden] { display: none; }
+    .window.open  { animation: pop .35s steps(6, end); }
+    .window.shake { animation: shake .3s linear; }
+
+    @keyframes pop {
+      from { transform: scale(.85); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    @keyframes shake {
+      25% { transform: translateX(-1cqw); }
+      75% { transform: translateX(1cqw); }
+    }
+
+    .win-main {
+      left: 4.7%;
+      top: 15.8%;
+      width: 90.6%;
+      height: 68%;
+      padding: .9cqw;
+      border: .4cqw solid #d889b4;
+      border-radius: 1.6cqw;
+      background: linear-gradient(180deg, #f6cfe3 0%, #e9a9cb 100%);
+      box-shadow: 0 1.2cqw 3cqw rgba(0, 0, 0, .45);
+    }
+
+    .titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 6.4cqw;
+      padding-left: 1.6cqw;
+      font-family: "Itim", "Comic Sans MS", cursive;
+      font-size: 4.4cqw;
+      line-height: 1;
+      color: #1c1c1c;
+    }
+
+    .controls { display: flex; height: 100%; }
+    .ctl {
+      width: 9.5cqw;
+      height: 100%;
+      margin-left: -.1cqw;
+      padding: 0;
+      border: .35cqw solid #7b7b8c;
+      border-radius: 0 0 1cqw 1cqw;
+      background: linear-gradient(180deg, #f2f4fa 0%, #b9c3da 100%);
+      color: #333;
+      font-family: Tahoma, Verdana, sans-serif;
+      font-size: 3.8cqw;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .ctl:first-child { border-radius: 0 0 0 1cqw; }
+    .ctl-close {
+      width: 14cqw;
+      border-radius: 0 0 1cqw 0;
+      background: linear-gradient(180deg, #f4a193 0%, #d3402f 100%);
+      color: #fff;
+    }
+    .ctl:hover  { filter: brightness(1.08); }
+    .ctl:active { filter: brightness(.92); }
+
+    .window-body {
+      flex: 1;
+      margin-top: .8cqw;
+      padding: 3cqw 4cqw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      text-align: center;
+      background: #f0f0f0;
+      border: .4cqw solid #777;
+      font-family: "Itim", "Comic Sans MS", "Chalkboard SE", cursive;
+      color: #111;
+      overflow: hidden;
+    }
+
+    /* Welcome */
+    .window-body h1 { margin: 0; font-size: 9cqw; font-weight: 400; }
+    .window-body > img { width: 54%; height: auto; }
+    .window-body > p {
+      margin: 0;
+      font-size: 6.6cqw;
+      line-height: 1.35;
+      letter-spacing: .25cqw;
+    }
+
+    /* ---------- Pixel frame buttons (assets/button.png) ---------- */
+    .frame-btn {
+      border: 0;
+      padding: 0;
+      aspect-ratio: 2.12;
+      display: grid;
+      place-items: center;
+      background: url("assets/button.png") center / 100% 100% no-repeat;
+      image-rendering: pixelated;
+      color: #222;
+      font-family: "Itim", "Comic Sans MS", cursive;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .frame-btn span { display: block; transform: translateY(-.3cqw); }
+    .frame-btn:hover,
+    .frame-btn:focus-visible { transform: translateY(-.6cqw); filter: brightness(1.05); outline: none; }
+    .frame-btn:active { transform: scale(.96); }
+
+    .frame-btn.big   { width: 33.5cqw; font-size: 6.2cqw; letter-spacing: .3cqw; }
+    .frame-btn.small { width: 20.5cqw; font-size: 3.9cqw; }
+    .frame-btn.price { width: 22cqw;   font-size: 5.6cqw; }
+
+    /* The crossed-out original price does nothing */
+    .frame-btn.old { cursor: default; }
+    .frame-btn.old:hover,
+    .frame-btn.old:focus-visible { transform: none; filter: none; }
+    .frame-btn.old span {
+      text-decoration: line-through;
+      text-decoration-color: #e11;
+      text-decoration-thickness: .5cqw;
+    }
+
+    /* ---------- Menu window ---------- */
+    .menu-body {
+      justify-content: flex-start;
+      padding: 2cqw 2.7cqw;
+    }
+    .menu-body .lead {
+      align-self: flex-start;
+      margin: 0 0 3.2cqw;
+      font-size: 6.4cqw;
+      line-height: 1.15;
+      letter-spacing: .15cqw;
+    }
+    .menu-body h2 {
+      margin: 0;
+      font-size: 7.4cqw;
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: .2cqw;
+    }
+    .menu-body h2.second { margin-top: .5cqw; }
+
+    .flavors {
+      display: grid;
+      grid-template-columns: repeat(3, 20.5cqw);
+      column-gap: 7.2cqw;
+      row-gap: 3.2cqw;
+      margin-top: 1.5cqw;
+    }
+    .flavors > :last-child { grid-column: 2; }
+
+    /* Locked slots: no behavior at all */
+    .locked {
+      width: 20.5cqw;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: not-allowed;
+    }
+    .locked img { display: block; width: 100%; height: auto; pointer-events: none; }
+
+    /* ---------- Premium pack pop-up (blue window) ---------- */
+    .win-premium {
+      z-index: 20;
+      left: 9.9%;
+      top: 22.8%;
+      width: 80%;
+      height: 53.8%;
+      padding: .8cqw;
+      border: .3cqw solid #3f5f8a;
+      border-radius: 1.4cqw;
+      background: linear-gradient(180deg, #c4dcf4 0%, #82aadb 45%, #5b8cc4 100%);
+      box-shadow: 0 1.2cqw 3cqw rgba(0, 0, 0, .5), inset 0 0 0 .2cqw rgba(255, 255, 255, .6);
+    }
+    .win-premium .titlebar {
+      height: 5.2cqw;
+      padding-left: 1.2cqw;
+      font-size: 4cqw;
+      text-shadow: 0 0 .8cqw #fff;
+    }
+    .win-premium .ctl { width: 7.2cqw; border-color: #5b6f8f; font-size: 3cqw; }
+    .win-premium .ctl-close { width: 10.5cqw; }
+
+    .prem-body {
+      flex: 1;
+      margin-top: .6cqw;
+      padding: 3cqw 3.5cqw 3.5cqw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      background: #f0f0f0;
+      border: .3cqw solid #5a7aa5;
+      font-family: "Itim", "Comic Sans MS", cursive;
+      color: #111;
+      overflow: hidden;
+    }
+    .crown { font-size: 11cqw; line-height: 1; }
+    .prem-body h2 { margin: 0; font-size: 8.2cqw; font-weight: 400; line-height: 1.1; letter-spacing: .2cqw; }
+    .perks { margin: 0; font-size: 4.9cqw; line-height: 1.3; letter-spacing: .2cqw; }
+    .limited {
+      align-self: flex-start;
+      margin: 0 0 0 .5cqw;
+      font-size: 4.2cqw;
+      text-transform: uppercase;
+    }
+    .prices { display: flex; justify-content: center; gap: 11cqw; }
+
+    /* ---------- "System message" code prompt (retro dialog) ---------- */
+    .win-code,
+    .win-quiz {
+      z-index: 30;
+      padding: .6cqw;
+      background: #c0c0c0;
+      border: .5cqw solid;
+      border-color: #fff #404040 #404040 #fff;
+      box-shadow: 0 0 0 .3cqw #000, 0 1.2cqw 3cqw rgba(0, 0, 0, .5);
+    }
+    .code-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 9cqw;
+      padding: 0 1.4cqw 0 2cqw;
+      background: #0000a8;
+      color: #fff;
+      font-family: "Pixelify Sans", "Courier New", monospace;
+      font-weight: 500;
+      font-size: 5.2cqw;
+      letter-spacing: .2cqw;
+    }
+    .code-x {
+      width: 6cqw;
+      height: 6cqw;
+      padding: 0;
+      background: #c0c0c0;
+      border: .4cqw solid;
+      border-color: #fff #404040 #404040 #fff;
+      box-shadow: 0 0 0 .2cqw #000;
+      color: #000;
+      font-family: "Pixelify Sans", monospace;
+      font-size: 4.2cqw;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .code-x:active { border-color: #404040 #fff #fff #404040; }
+
+    .code-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-evenly;
+      padding: 1cqw 4cqw;
+      text-align: center;
+      font-family: "Itim", "Comic Sans MS", cursive;
+      color: #111;
+    }
+    .code-body p { margin: 0; font-size: 5.4cqw; line-height: 1.3; letter-spacing: .15cqw; }
+
+    #code-input {
+      width: 48cqw;
+      height: 9cqw;
+      padding: 0 1cqw;
+      text-align: center;
+      font-family: "Itim", "Comic Sans MS", cursive;
+      font-size: 6.4cqw;
+      letter-spacing: 1.6cqw;
+      text-indent: 1.6cqw; /* balances the trailing letter-spacing */
+      color: #111;
+      background: #fff;
+      border: .5cqw solid;
+      border-color: #404040 #fff #fff #404040;
+      box-shadow: 0 0 0 .2cqw #000;
+      border-radius: 0;
+      outline: none;
+    }
+    #code-input:focus { background: #fffde8; }
+    #code-input.bad { animation: shake .3s linear; }
+
+    .code-msg {
+      min-height: 5.4cqw;
+      font-size: 4.4cqw !important;
+    }
+    .code-msg.err { color: #b3261e; }
+    .code-msg.ok  { color: #1b6e2c; }
+
+    .win-code { left: 4.7%;  top: 37.2%; width: 91%;   height: 39.3%; }
+    .win-quiz { left: 18.4%; top: 32%;   width: 62.5%; height: 27%; }
+
+    /* Window title that is bigger than the default (Menu) */
+    .titlebar .lg { font-size: 5.8cqw; }
+
+    /* "Confirmation:" heading in the Coffee windows */
+    .menu-body .lead.center { align-self: center; font-size: 6.8cqw; margin-bottom: 3.2cqw; }
+
+    /* ---------- Coffee: toppings step ---------- */
+    .order-body { justify-content: flex-start; padding: 2cqw 2.7cqw; }
+    .order-body .lead {
+      margin: 0;
+      font-size: 6.8cqw;
+      line-height: 1.15;
+      letter-spacing: .15cqw;
+    }
+    .order-body .topping-label {
+      align-self: flex-start;
+      margin: 7.4cqw 0 0 .6cqw;
+      font-size: 5.4cqw;
+      line-height: 1.15;
+      letter-spacing: .15cqw;
+    }
+    .frame-btn.wide {
+      width: 38cqw;
+      margin-top: 4.4cqw;
+      font-size: 6.8cqw;
+      letter-spacing: .3cqw;
+    }
+
+    /* ---------- "This is a long quiz" dialog ---------- */
+    .code-body.quiz-body { padding: 1cqw 3cqw; }
+    .code-body.quiz-body p { font-size: 4.9cqw; }
+    .code-body.quiz-body p.big { font-size: 6.4cqw; }
+    .sys-row { display: flex; justify-content: center; gap: 2cqw; }
+    .sys-btn {
+      width: 19cqw;
+      height: 5.8cqw;
+      padding: 0;
+      background: #c0c0c0;
+      border: .4cqw solid;
+      border-color: #fff #404040 #404040 #fff;
+      box-shadow: 0 0 0 .2cqw #000;
+      color: #111;
+      font-family: "Itim", "Comic Sans MS", cursive;
+      font-size: 4.2cqw;
+      letter-spacing: .15cqw;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .sys-btn:active { border-color: #404040 #fff #fff #404040; }
+
+    /* ---------- Picture pop-ups ---------- */
+    .window-body.photo-body { justify-content: flex-start; padding: 5.8cqw 0 0; }
+    .window-body.photo-body > img { width: 68cqw; height: auto; image-rendering: auto; }
+
+    .window-body.sorry-body { justify-content: flex-start; padding: 2.5cqw 4cqw; }
+    .window-body.sorry-body > img { width: 47.8cqw; height: auto; image-rendering: auto; }
+    .sorry-body .note {
+      margin: 9cqw 0 0;
+      font-size: 6.4cqw;
+      line-height: 1.35;
+      letter-spacing: .25cqw;
+    }
+
+    /* ---------- Spinning disk ---------- */
+    .disk img { animation: spin 3.2s linear infinite; animation-play-state: paused; }
+    .disk.playing img { animation-play-state: running; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .disk img { animation: none; }
+      .door, .door.knocking, .window.open, .window.shake, #code-input.bad { animation: none; }
+      .screen, .screen.active, #fade { transition-duration: .01s; }
+    }
+  </style>
+</head>
+
+<body>
+  <main id="app">
+
+    <!-- ============ OUTSIDE SCREEN ============ -->
+    <section id="outside" class="screen active" aria-label="Outside the cafe">
+      <div class="stage" style="--w:472; --h:839;">
+        <img class="bg" src="assets/ext-bg.png" alt="Pixel art storefront of Brew Knowledge" draggable="false">
+        <button id="door" class="door" type="button" aria-label="Knock on the door"></button>
+      </div>
+    </section>
+
+    <!-- ============ INSIDE SCREEN ============ -->
+    <section id="inside" class="screen" aria-label="Inside the cafe" aria-hidden="true">
+      <div class="stage" style="--w:707; --h:1000;">
+        <img class="bg" src="assets/ing-bg.png" alt="Pixel art coffee shop interior" draggable="false">
+
+        <button class="item logo" type="button" data-action="logo" aria-label="Brew Knowledge logo">
+          <img src="assets/brew-knowledge.png" alt="" draggable="false">
+        </button>
+        <button class="item menu" type="button" data-action="menu" aria-label="Coffee menu">
+          <img src="assets/menu.png" alt="" draggable="false">
+        </button>
+        <button class="item coffee" type="button" data-action="coffee" aria-label="Coffee cup">
+          <img src="assets/coffee.png" alt="" draggable="false">
+        </button>
+        <button class="item gourdy" type="button" data-action="gourdy" aria-label="Gourdy">
+          <img src="assets/gourdy.png" alt="" draggable="false">
+        </button>
+        <button class="item disk" type="button" data-action="disk" aria-label="Vinyl record">
+          <img src="assets/disk.png" alt="" draggable="false">
+        </button>
+
+        <!-- WELCOME POP-UP -->
+        <div id="welcome" class="window win-main" role="dialog" aria-labelledby="welcome-title" hidden>
+          <div class="titlebar">
+            <span id="welcome-title">&hearts; Welcome</span>
+            <div class="controls">
+              <button type="button" class="ctl" data-window="close" aria-label="Minimize">&#8211;</button>
+              <button type="button" class="ctl" data-window="max" aria-label="Maximize">&#9633;</button>
+              <button type="button" class="ctl ctl-close" data-window="close" aria-label="Close">&#10005;</button>
+            </div>
+          </div>
+          <div class="window-body">
+            <h1>Welcome to</h1>
+            <img src="assets/brew-knowledge.png" alt="Brew Knowledge" draggable="false">
+            <p>Please enjoy your stay and make sure to click everything!</p>
+          </div>
+        </div>
+
+        <!-- MENU POP-UP -->
+        <div id="menu-win" class="window win-main" role="dialog" aria-labelledby="menu-title" hidden>
+          <div class="titlebar">
+            <span id="menu-title" class="lg">&hearts; Menu</span>
+            <div class="controls">
+              <button type="button" class="ctl" data-window="close" aria-label="Minimize">&#8211;</button>
+              <button type="button" class="ctl" data-window="max" aria-label="Maximize">&#9633;</button>
+              <button type="button" class="ctl ctl-close" data-window="close" aria-label="Close">&#10005;</button>
+            </div>
+          </div>
+          <div class="window-body menu-body">
+            <p class="lead">Choose your flavor:</p>
+
+            <h2>Freebies:</h2>
+            <button type="button" class="frame-btn big" id="aral-pan"><span>ARAL PAN</span></button>
+
+            <h2 class="second">Premium pack:</h2>
+            <div class="flavors">
+              <button type="button" class="frame-btn small" data-subject="English"><span>English</span></button>
+              <button type="button" class="frame-btn small" data-subject="Math"><span>Math</span></button>
+              <button type="button" class="locked" aria-label="Locked"><img src="assets/locked-butt.png" alt="" draggable="false"></button>
+              <button type="button" class="frame-btn small" data-subject="Science"><span>Science</span></button>
+              <button type="button" class="locked" aria-label="Locked"><img src="assets/locked-butt.png" alt="" draggable="false"></button>
+              <button type="button" class="locked" aria-label="Locked"><img src="assets/locked-butt.png" alt="" draggable="false"></button>
+              <button type="button" class="locked" aria-label="Locked"><img src="assets/locked-butt.png" alt="" draggable="false"></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COFFEE ORDER POP-UP -->
+        <div id="coffee-win" class="window win-main" role="dialog" aria-labelledby="coffee-title" hidden>
+          <div class="titlebar">
+            <span id="coffee-title">&hearts;Order up!</span>
+            <div class="controls">
+              <button type="button" class="ctl" data-window="close" aria-label="Minimize">&#8211;</button>
+              <button type="button" class="ctl" data-window="max" aria-label="Maximize">&#9633;</button>
+              <button type="button" class="ctl ctl-close" data-window="close" aria-label="Close">&#10005;</button>
+            </div>
+          </div>
+          <div class="window-body menu-body">
+            <p class="lead center">Confirmation:</p>
+
+            <h2>Freebies:</h2>
+            <button type="button" class="frame-btn big" id="aral-order"><span>ARAL PAN</span></button>
+
+            <h2 class="second">Premium pack:</h2>
+            <div class="flavors">
+              <button type="button" class="frame-btn small" data-subject="English"><span>English</span></button>
+              <button type="button" class="frame-btn small" data-subject="Math"><span>Math</span></button>
+              <button type="button" class="locked" aria-label="Locked"><img src="assets/locked-butt.png" alt="" draggable="false"></button>
+              <button type="button" class="frame-btn small" data-subject="Science"><span>Science</span></button>
+              <button type="button" class="locked" aria-label="Locked"><img src="assets/locked-butt.png" alt="" draggable="false"></button>
+              <button type="button" class="locked" aria-label="Locked"><img src="assets/locked-butt.png" alt="" draggable="false"></button>
+              <button type="button" class="locked" aria-label="Locked"><img src="assets/locked-butt.png" alt="" draggable="false"></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COFFEE ORDER: TOPPINGS STEP -->
+        <div id="order-win" class="window win-main" role="dialog" aria-labelledby="order-title" hidden>
+          <div class="titlebar">
+            <span id="order-title">&hearts;Order up!</span>
+            <div class="controls">
+              <button type="button" class="ctl" data-window="close" aria-label="Minimize">&#8211;</button>
+              <button type="button" class="ctl" data-window="max" aria-label="Maximize">&#9633;</button>
+              <button type="button" class="ctl ctl-close" data-window="close" aria-label="Close">&#10005;</button>
+            </div>
+          </div>
+          <div class="window-body order-body">
+            <p class="lead">Confirmation:</p>
+            <p class="topping-label">Toppings</p>
+            <button type="button" class="frame-btn wide" id="order-complete"><span>Complete</span></button>
+          </div>
+        </div>
+
+        <!-- LOGO: CAFE BEAR PICTURE ONLY -->
+        <div id="bear-win" class="window win-main" role="dialog" aria-label="Cafe bear" hidden>
+          <div class="titlebar">
+            <span aria-hidden="true">&hearts;</span>
+            <div class="controls">
+              <button type="button" class="ctl" data-window="close" aria-label="Minimize">&#8211;</button>
+              <button type="button" class="ctl" data-window="max" aria-label="Maximize">&#9633;</button>
+              <button type="button" class="ctl ctl-close" data-window="close" aria-label="Close">&#10005;</button>
+            </div>
+          </div>
+          <div class="window-body photo-body">
+            <img src="assets/cafe-bear.png" alt="Plush bear in round glasses beside a strawberry cake" draggable="false">
+          </div>
+        </div>
+
+        <!-- GOURDY: WORK IN PROGRESS -->
+        <div id="twisted-win" class="window win-main" role="dialog" aria-labelledby="twisted-title" hidden>
+          <div class="titlebar">
+            <span id="twisted-title">&hearts; Sorry!</span>
+            <div class="controls">
+              <button type="button" class="ctl" data-window="close" aria-label="Minimize">&#8211;</button>
+              <button type="button" class="ctl" data-window="max" aria-label="Maximize">&#9633;</button>
+              <button type="button" class="ctl ctl-close" data-window="close" aria-label="Close">&#10005;</button>
+            </div>
+          </div>
+          <div class="window-body sorry-body">
+            <img src="assets/twisted.png" alt="Twisted gourdy" draggable="false">
+            <p class="note">This section is a work in progress!!</p>
+          </div>
+        </div>
+
+        <!-- PREMIUM PACK POP-UP -->
+        <div id="premium-win" class="window win-premium" role="dialog" aria-labelledby="premium-title" hidden>
+          <div class="titlebar">
+            <span id="premium-title" aria-label="Premium pack">&hearts;</span>
+            <div class="controls">
+              <button type="button" class="ctl" data-window="close" aria-label="Minimize">&#8211;</button>
+              <button type="button" class="ctl" data-window="max" aria-label="Maximize">&#9633;</button>
+              <button type="button" class="ctl ctl-close" data-window="close" aria-label="Close">&#10005;</button>
+            </div>
+          </div>
+          <div class="prem-body">
+            <div class="crown" aria-hidden="true">&#128081;</div>
+            <h2>Premium pack!</h2>
+            <p class="perks">Perks:<br>Unlock all reviewers<br>Unlock all quizzes</p>
+            <p class="limited">Limited time only!!</p>
+            <div class="prices">
+              <button type="button" class="frame-btn price" id="buy-40" aria-label="Get premium for 40 pesos"><span>&#8369;40</span></button>
+              <button type="button" class="frame-btn price old" aria-label="Original price 50 pesos"><span>&#8369;50</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUIZ CONFIRMATION -->
+        <div id="quiz-win" class="window win-quiz" role="alertdialog" aria-labelledby="quiz-title" hidden>
+          <div class="code-title">
+            <span id="quiz-title">System message</span>
+            <button type="button" class="code-x" data-window="close" aria-label="Close">X</button>
+          </div>
+          <div class="code-body quiz-body">
+            <p class="big">This is a long quiz.</p>
+            <p>Do you still wish to proceed?</p>
+            <div class="sys-row">
+              <button type="button" class="sys-btn" id="quiz-yes">Yes</button>
+              <button type="button" class="sys-btn" id="quiz-no">No thanks</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CODE PROMPT -->
+        <div id="code-win" class="window win-code" role="dialog" aria-labelledby="code-title" hidden>
+          <div class="code-title">
+            <span id="code-title">System message</span>
+            <button type="button" class="code-x" data-window="close" aria-label="Close">X</button>
+          </div>
+          <div class="code-body">
+            <p>For confirmation you bought premium, enter the code.</p>
+            <input id="code-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4"
+                   autocomplete="off" aria-label="Confirmation code">
+            <p id="code-msg" class="code-msg" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <div id="fade"></div>
+
+  <script>
+  (() => {
+    /* ====== Settings you may want to edit ====== */
+    const PREMIUM_CODE = '1006';
+    const SUBJECT_PAGES = { English: 'English.html', Math: 'Math.html', Science: 'Science.html' };
+    const REVIEW_PAGE  = 'reveiwAp.html';   // Aral Pan destination (spelled as you gave it)
+    const GOOGLE_FORM_URL = '';             // paste your Google Form link here
+
+    const $ = (id) => document.getElementById(id);
+    const outside = $('outside');
+    const inside  = $('inside');
+    const door    = $('door');
+    const welcome = $('welcome');
+    const menuWin = $('menu-win');
+    const premWin = $('premium-win');
+    const codeWin = $('code-win');
+    const quizWin = $('quiz-win');
+    const coffeeWin  = $('coffee-win');
+    const orderWin   = $('order-win');
+    const bearWin    = $('bear-win');
+    const twistedWin = $('twisted-win');
+    const fade    = $('fade');
+
+    /* ====== Window helpers ====== */
+    const children = new Map([
+      [menuWin,   [premWin, codeWin]],
+      [coffeeWin, [orderWin, quizWin, premWin, codeWin]],
+      [orderWin,  [quizWin]],
+      [premWin,   [codeWin]],
+    ]);
+
+    // Only one "main" window at a time (the logo, menu, coffee and gourdy ones)
+    const mainWins = [welcome, menuWin, coffeeWin, bearWin, twistedWin];
+    function openMain(win) {
+      mainWins.forEach((w) => { if (w !== win && !w.hidden) closeWin(w); });
+      openWin(win);
+    }
+
+    function openWin(win) {
+      win.hidden = false;
+      win.classList.remove('open');
+      void win.offsetWidth;            // restart the pop animation
+      win.classList.add('open');
+    }
+    function closeWin(win) {
+      win.hidden = true;
+      win.classList.remove('open');
+      (children.get(win) || []).forEach(closeWin);
+    }
+    function shakeEl(el) {
+      el.classList.remove('shake');
+      void el.offsetWidth;
+      el.classList.add('shake');
+    }
+
+    /* ====== Outside -> Inside ====== */
+    const knock = new Audio('assets/knock.mp3');
+    knock.preload = 'auto';
+    let entering = false;
+
+    function enterCafe() {
+      outside.classList.remove('active');
+      outside.setAttribute('aria-hidden', 'true');
+      inside.classList.add('active');
+      inside.removeAttribute('aria-hidden');
+      setTimeout(() => openWin(welcome), 700);
+    }
+
+    door.addEventListener('click', () => {
+      if (entering) return;
+      entering = true;
+      door.classList.add('knocking');
+
+      let proceeded = false;
+      const proceed = () => {
+        if (proceeded) return;
+        proceeded = true;
+        enterCafe();
+      };
+
+      knock.addEventListener('ended', () => setTimeout(proceed, 250), { once: true });
+      setTimeout(proceed, 3000);                       // never get stuck
+      knock.currentTime = 0;
+      knock.play().catch(() => setTimeout(proceed, 700));
+    });
+
+    /* ====== Window buttons (minimize / maximize / close / X) ====== */
+    inside.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-window]');
+      if (!btn) return;
+      const win = btn.closest('.window');
+      if (btn.dataset.window === 'close') closeWin(win);
+      else shakeEl(win);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const top = [codeWin, quizWin, premWin, orderWin, coffeeWin, menuWin, bearWin, twistedWin, welcome].find((w) => !w.hidden);
+      if (top) closeWin(top);
+    });
+
+    /* ====== Premium state ====== */
+    const isPremium = () => {
+      try { return localStorage.getItem('bk_premium') === '1'; } catch { return false; }
+    };
+    const setPremium = () => {
+      try { localStorage.setItem('bk_premium', '1'); } catch { /* ignore */ }
+    };
+
+    /* ====== Menu flow ====== */
+    function goTo(url) {
+      fade.classList.add('on');
+      setTimeout(() => { window.location.href = url; }, 600);
+    }
+
+    // Freebies: Aral Pan -> another page
+    $('aral-pan').addEventListener('click', () => goTo(REVIEW_PAGE));
+
+    let pendingSubject = null;   // subject they tried to open before unlocking
+
+    // Premium pack: English / Math / Science
+    document.querySelectorAll('[data-subject]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (isPremium()) {
+          actions.subject(btn.dataset.subject);
+        } else {
+          pendingSubject = btn.dataset.subject;
+          openWin(premWin);
+        }
+      });
+    });
+
+    // Locked buttons intentionally have no handler.
+
+    /* ====== Coffee flow ====== */
+    // Aral Pan -> toppings step -> Complete -> "long quiz" prompt
+    $('aral-order').addEventListener('click', () => openWin(orderWin));
+    $('order-complete').addEventListener('click', () => openWin(quizWin));
+    $('quiz-yes').addEventListener('click', () => {
+      closeWin(quizWin);
+      if (GOOGLE_FORM_URL) window.open(GOOGLE_FORM_URL, '_blank', 'noopener');
+      else console.warn('GOOGLE_FORM_URL is empty: paste your Google Form link at the top of the script.');
+    });
+    $('quiz-no').addEventListener('click', () => closeWin(quizWin));
+
+    // PHP 40 -> code prompt  (PHP 50 intentionally does nothing)
+    const codeInput = $('code-input');
+    const codeMsg   = $('code-msg');
+    let checking = false;
+
+    function setMsg(text, kind) {
+      codeMsg.textContent = text;
+      codeMsg.className = 'code-msg' + (kind ? ' ' + kind : '');
+    }
+
+    $('buy-40').addEventListener('click', () => {
+      checking = false;
+      codeInput.disabled = false;
+      codeInput.value = '';
+      setMsg('', '');
+      openWin(codeWin);
+      setTimeout(() => codeInput.focus(), 50);
+    });
+
+    function checkCode() {
+      if (checking || codeInput.value.length !== 4) return;
+
+      if (codeInput.value === PREMIUM_CODE) {
+        checking = true;
+        codeInput.disabled = true;
+        setPremium();
+        setMsg('Premium unlocked! ♡', 'ok');
+        setTimeout(() => {
+          closeWin(codeWin);
+          closeWin(premWin);
+          actions.premiumUnlocked();
+        }, 1000);
+      } else {
+        setMsg('Wrong code, try again.', 'err');
+        codeInput.classList.remove('bad');
+        void codeInput.offsetWidth;
+        codeInput.classList.add('bad');
+        codeInput.value = '';
+        codeInput.focus();
+      }
+    }
+
+    codeInput.addEventListener('input', () => {
+      codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 4);
+      if (codeInput.value.length < 4) setMsg('', '');
+      if (codeInput.value.length === 4) setTimeout(checkCode, 150);
+    });
+    codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkCode(); });
+
+    /* ====== Click sound ====== */
+    // Plays on buttons that do something. Skipped: the door (it has the knock),
+    // the locked buttons, and the crossed-out PHP 50.
+    const clicky = new Audio('assets/clicky.mp3');
+    clicky.preload = 'auto';
+    const SFX_SELECTOR = '.item, .frame-btn:not(.old), .sys-btn, [data-window]';
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest(SFX_SELECTOR)) return;
+      const snd = clicky.cloneNode();          // clone so fast clicks can overlap
+      snd.play().catch(() => {});
+    });
+
+    /* ====== Disk: spin + background music ====== */
+    const bgm = new Audio('assets/bg.mp3');
+    bgm.loop = true;
+    bgm.preload = 'auto';
+    const diskBtn = inside.querySelector('.disk');
+
+    function setDisk(on) { diskBtn.classList.toggle('playing', on); }
+    function stopMusic() { bgm.pause(); setDisk(false); }
+    function toggleMusic() {
+      if (bgm.paused) {
+        setDisk(true);
+        bgm.play().catch(() => setDisk(false));
+      } else {
+        stopMusic();
+      }
+    }
+    // Leaving the tab or page stops the music
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stopMusic(); });
+    window.addEventListener('pagehide', stopMusic);
+
+    /* ====== Inside items ====== */
+    const actions = {
+      logo()   { openMain(bearWin); },
+      menu()   { openMain(menuWin); },
+      coffee() { openMain(coffeeWin); },
+      gourdy() { openMain(twistedWin); },
+      disk()   { toggleMusic(); },
+
+      // After a correct code, English / Math / Science call this:
+      subject(name) { goTo(SUBJECT_PAGES[name]); },
+      // Right after a correct code, go to the subject they originally clicked
+      premiumUnlocked() { if (pendingSubject) actions.subject(pendingSubject); },
+    };
+
+    document.querySelectorAll('[data-action]').forEach((el) => {
+      el.addEventListener('click', () => {
+        el.classList.add('poke');
+        setTimeout(() => el.classList.remove('poke'), 200);
+        const fn = actions[el.dataset.action];
+        if (fn) fn(el);
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
