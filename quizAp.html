@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AP Quiz</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --rule: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #d4d4d4;
+    --ok: #1b6e2c;
+    --ok-bg: #e6f4e9;
+    --bad: #b3261e;
+    --bad-bg: #fbe9e7;
+    --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121212; --fg: #f0f0f0; --rule: #f0f0f0; --muted: #9a9a9a; --line: #3a3a3a;
+      --ok: #7fd993; --ok-bg: #16301c; --bad: #ff8f86; --bad-bg: #3a1a17;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121212; --fg: #f0f0f0; --rule: #f0f0f0; --muted: #9a9a9a; --line: #3a3a3a;
+    --ok: #7fd993; --ok-bg: #16301c; --bad: #ff8f86; --bad-bg: #3a1a17;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    margin: 0;
+    padding-inline: 1rem;
+    padding-block: 2.5rem 4rem;
+  }
+  main { max-width: 46rem; margin-inline: auto; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 5vw, 2.25rem);
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    text-wrap: balance;
+    margin: 0;
+  }
+  hr { border: 0; border-top: 2px solid var(--rule); margin: 1rem 0 1.5rem; }
+
+  .note { color: var(--muted); margin: 0 0 1.5rem; }
+
+  .who { max-width: 24rem; margin-bottom: 2rem; }
+  .intro { font-weight: 600; margin: 0 0 0.5rem; text-wrap: balance; }
+  .who label { display: block; font-family: var(--font-display); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.25rem; }
+
+  input[type="text"] {
+    width: 100%;
+    font: inherit;
+    color: var(--fg);
+    background: var(--bg);
+    border: 2px solid var(--rule);
+    border-radius: 0;
+    padding: 0.55rem 0.7rem;
+  }
+  input[type="text"]:focus-visible { outline: 3px solid var(--muted); outline-offset: 2px; }
+  input:disabled { opacity: 1; background: transparent; }
+
+  ol.questions { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.5rem; }
+  .q { min-width: 0; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
+  .q fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  .q legend, .q .qtext { font-weight: 600; padding: 0; margin-bottom: 0.6rem; overflow-wrap: anywhere; }
+  .qnum { font-family: var(--font-display); letter-spacing: 0.04em; margin-right: 0.4rem; }
+
+  .choice {
+    display: flex; gap: 0.65rem; align-items: flex-start;
+    padding: 0.5rem 0.7rem; border: 1px solid var(--line); margin-bottom: 0.4rem; cursor: pointer;
+  }
+  .choice input { margin-top: 0.4rem; accent-color: var(--fg); }
+  .choice span { min-width: 0; overflow-wrap: anywhere; }
+
+  .q.correct { border-left: 4px solid var(--ok); padding-left: 0.8rem; }
+  .q.wrong { border-left: 4px solid var(--bad); padding-left: 0.8rem; }
+  .feedback { margin: 0.6rem 0 0; padding: 0.45rem 0.7rem; font-size: 0.97rem; }
+  .q.correct .feedback { background: var(--ok-bg); color: var(--ok); }
+  .q.wrong .feedback { background: var(--bad-bg); color: var(--bad); }
+
+  .btn {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--fg);
+    background: var(--bg);
+    border: 2px solid var(--rule);
+    padding: 0.7rem 1.4rem;
+    cursor: pointer;
+  }
+  .btn:hover, .btn:focus-visible { background: var(--fg); color: var(--bg); outline: none; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; background: var(--bg); color: var(--fg); }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+  #msg { min-height: 1.6rem; margin: 1rem 0 0; color: var(--bad); }
+
+  .result { border: 2px solid var(--rule); padding: 1rem 1.2rem; margin-bottom: 2rem; }
+  .result h2 { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 0.05em; text-transform: uppercase; margin: 0 0 0.25rem; }
+  .result .score { font-family: var(--font-display); font-size: clamp(2rem, 9vw, 3rem); line-height: 1.1; margin: 0; font-variant-numeric: tabular-nums; }
+  .result p { margin: 0.4rem 0 0; }
+  .result .small { color: var(--muted); font-size: 0.95rem; }
+  .result h3 { font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; margin: 1.25rem 0 0.5rem; }
+  .wrong-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+  .wrong-list li { border-left: 4px solid var(--bad); padding-left: 0.8rem; min-width: 0; overflow-wrap: anywhere; }
+  .result .wrong-list p { margin: 0; }
+  .wrong-list .wq { font-weight: 600; }
+  .wrong-list .wmine { color: var(--bad); }
+  .wrong-list .wright { color: var(--ok); }
+  .result .goodjob { margin-top: 1.25rem; font-weight: 600; }
+  .result .btn { margin-top: 1.25rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>AP Quiz (Topic 1 and 2)</h1>
+  <hr>
+
+  <section id="result" class="result" hidden aria-live="polite" tabindex="-1"></section>
+
+  <div id="quizArea">
+  <p class="intro">BEHOLD THE GREATEST LONG QUIZ EVER (some questions are not added. Please. Spare me.) All of this is identification MWUAHAHHAA SUFFER.</p>
+  <p class="note">Isang sagot lang bawat tanong. Okay lang ang malaki o maliit na letra at ang maliit na typo.</p>
+
+  <form id="quiz" novalidate autocomplete="off">
+    <div class="who">
+      <label for="name">Pangalan</label>
+      <input type="text" id="name" maxlength="60">
+    </div>
+
+    <ol class="questions" id="questions"></ol>
+
+    <p id="msg" role="status"></p>
+    <div class="actions">
+      <button type="button" class="btn" id="submit">Check score</button>
+      <a class="btn" href="index.html">Head back to the cafe?</a>
+    </div>
+  </form>
+  </div>
+</main>
+
+<script>
+  /* ====== Settings ====== */
+  var QUIZ_NAME = "AP Reviewer (Topic 1 and 2)";
+  // Paste your Google Apps Script web app URL here to receive scores in a Google Sheet.
+  var SCORE_URL = "";
+
+  /* ====== Questions ======
+     id    = type-in. "answers" lists every accepted answer (typos and letter case are forgiven).
+     mc    = multiple choice. "choices" lists the options, "correct" is the right one. */
+  var QUESTIONS = [
+    { type: "id", q: "Ano ang lumang pangalan ng Iran?", answers: ["Persia", "Persya"] },
+    { type: "id", q: "Sa anong bansa matatagpuan ang Hague?", answers: ["Netherlands", "Netherland", "Holland"] },
+    { type: "id", q: "Ano ang dahilan ng People Power?", answers: ["Snap election", "Snap"] },
+    { type: "id", q: "Sino ang nagtatag ng Martial Law?", answers: ["Ferdinand Marcos Sr", "Ferdinand E Marcos Sr", "Ferdinand Marcos", "Marcos Sr", "Marcos"] },
+    { type: "mc", q: "Ang 17th parallel na dating naghati sa Hilaga at Timog Vietnam ay anong uri ng hangganan?", choices: ["Geometrik", "Pisikal", "Pulitikal", "Kultural"], correct: "Geometrik" },
+    { type: "mc", q: "Anong uri ng mapa ang nagpapakita ng legal na hangganan ng mga bansa?", choices: ["Pulitikal", "Pisikal", "Kultural", "Geometrik"], correct: "Pulitikal" },
+    { type: "mc", q: "Ano ang hinahati ng Ekwador?", choices: ["Hilaga at Timog", "Kanluran at Silangan", "Asya at Europa", "Amerika at Africa"], correct: "Hilaga at Timog" },
+    { type: "id", q: "Ano ang tawag sa mga tuntunin at kasunduang gumagabay sa ugnayan ng mga bansa?", answers: ["International Law", "Internasyonal na Batas"] },
+    { type: "id", q: "Ano ang pinakamahalagang elemento ng estado?", answers: ["Tao"] },
+    { type: "id", q: "Ano ang kasalukuyang Saligang Batas ng Pilipinas?", answers: ["1987 Constitution", "1987 Philippine Constitution", "Saligang Batas ng 1987", "1987 Saligang Batas", "1987"] },
+    { type: "id", q: "Sino ang pangulo ng 1st Republic (Malolos Republic)?", answers: ["Emilio Aguinaldo", "Aguinaldo"] },
+    { type: "id", q: "Sino ang kauna-unahang babaeng pangulo ng Pilipinas?", answers: ["Corazon Aquino", "Cory Aquino", "Corazon C Aquino", "Corazon", "Cory"] },
+    { type: "id", q: "Sinong pangulo ang nagpatupad na bawal ang \u201cwang-wang\u201d sa mga police car?", answers: ["Benigno Aquino III", "Benigno Aquino", "Benigno Noynoy Aquino III", "Noynoy Aquino", "Noynoy", "PNoy"] },
+    { type: "id", q: "Ano ang buong pangalan ng UNCLOS?", answers: ["United Nations Convention on the Law of the Sea"] },
+    { type: "id", q: "Hanggang ilang nautical miles ang territorial sea?", answers: ["12", "12 nautical miles", "12 nm"] },
+    { type: "id", q: "Hanggang ilang nautical miles ang Exclusive Economic Zone (EEZ)?", answers: ["200", "200 nautical miles", "200 nm"] },
+    { type: "id", q: "Anong pangulo ang nag-claim na atin ang Spratly Islands?", answers: ["Ferdinand Marcos Sr", "Ferdinand E Marcos Sr", "Ferdinand Marcos", "Marcos Sr", "Marcos"] },
+    { type: "id", q: "Anong pangulo ang naghabol sa Sabah, Malaysia?", answers: ["Diosdado Macapagal", "Diosdado P Macapagal", "Diosdado Pangan Macapagal", "Macapagal"] },
+    { type: "mc", q: "Bakit kini-claim ng China ang Kalayaan Group of Islands?", choices: ["Sila daw ang unang nakakita kaya kanila ito", "Binili nila ang mga isla sa Pilipinas", "Ibinigay ito sa kanila ng UNCLOS", "Nasa loob ito ng kanilang EEZ ayon sa Hague"], correct: "Sila daw ang unang nakakita kaya kanila ito" },
+    { type: "id", q: "Anong ahensya ng pamahalaan ang may hawak ng BIR?", answers: ["DOF", "Department of Finance"] },
+    { type: "id", q: "Anong Republic Act ang nag-amyenda sa Foreign Investments Act of 1991?", answers: ["11647", "RA 11647", "RA No 11647", "Republic Act 11647", "Republic Act No 11647"] },
+    { type: "id", q: "Sino ang nagtatag ng Pilipino First Policy?", answers: ["Carlos P Garcia", "Carlos Garcia", "Garcia"] },
+    { type: "id", q: "Ano ang tawag sa pangkalahatan at permanenteng paniniwala sa isang pangkat ng tao batay sa lahi, kasarian, edad o pinagmulan?", answers: ["Stereotype", "Stereotipo"] },
+    { type: "mc", q: "Ano ang tumutukoy sa pisikal na katangian ng isang tao ukol sa kanyang pagkababae o pagkalalaki?", choices: ["Sex", "Gender", "Gender roles", "Stereotype"], correct: "Sex" },
+    { type: "id", q: "Anong teorya ang nagsasabing natututuhan ang gender roles sa pamamagitan ng pagmamasid, paggaya at pagtanggap ng puna?", answers: ["Social Learning Theory", "Social Learning"] }
+  ];
+
+  /* MATCH-START */
+  function norm(s) {
+    return String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+  }
+
+  // Edit distance that also counts swapped neighbouring letters ("teh" for "the") as one typo
+  function distance(a, b) {
+    var d = [], i, j;
+    for (i = 0; i <= a.length; i++) { d[i] = [i]; }
+    for (j = 0; j <= b.length; j++) { d[0][j] = j; }
+    for (i = 1; i <= a.length; i++) {
+      for (j = 1; j <= b.length; j++) {
+        var cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+          d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+        }
+      }
+    }
+    return d[a.length][b.length];
+  }
+
+  // How many typos are allowed, based on the length of the correct answer
+  function allowedTypos(len) {
+    if (len <= 4) return 0;
+    if (len <= 7) return 1;
+    if (len <= 12) return 2;
+    return 3;
+  }
+
+  // Returns { ok, exact }. ok = counts as correct, exact = no typo at all.
+  function checkText(input, answers) {
+    var u = norm(input);
+    if (!u) return { ok: false, exact: false };
+    var forgiven = false;
+    for (var k = 0; k < answers.length; k++) {
+      var n = norm(answers[k]);
+      // Numbers must always match exactly
+      if (u.replace(/\D/g, "") !== n.replace(/\D/g, "")) continue;
+      var uc = u.replace(/ /g, ""), nc = n.replace(/ /g, "");
+      var dist = Math.min(distance(u, n), distance(uc, nc));
+      if (dist === 0) return { ok: true, exact: true };
+      if (dist <= allowedTypos(nc.length)) forgiven = true;
+    }
+    return { ok: forgiven, exact: false };
+  }
+  /* MATCH-END */
+
+  /* ====== Page ====== */
+  var form = document.getElementById("quiz");
+  var list = document.getElementById("questions");
+  var msg = document.getElementById("msg");
+  var resultBox = document.getElementById("result");
+  var submitBtn = document.getElementById("submit");
+  var items = [];
+  var submitted = false;
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function build() {
+    // Identification questions first (shuffled), all multiple choice at the very bottom
+    var typed = shuffle(QUESTIONS.filter(function (q) { return q.type !== "mc"; }));
+    var choice = shuffle(QUESTIONS.filter(function (q) { return q.type === "mc"; }));
+    items = typed.concat(choice).map(function (q) {
+      return { q: q, choices: q.type === "mc" ? shuffle(q.choices) : null, li: null };
+    });
+    items.forEach(function (it, i) {
+      var li = document.createElement("li");
+      li.className = "q";
+      var num = document.createElement("span");
+      num.className = "qnum";
+      num.textContent = (i + 1) + ".";
+
+      if (it.q.type === "mc") {
+        var fs = document.createElement("fieldset");
+        var lg = document.createElement("legend");
+        lg.appendChild(num);
+        lg.appendChild(document.createTextNode(it.q.q));
+        fs.appendChild(lg);
+        it.choices.forEach(function (c, ci) {
+          var label = document.createElement("label");
+          label.className = "choice";
+          var radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "q" + i;
+          radio.value = String(ci);
+          radio.id = "q" + i + "c" + ci;
+          var span = document.createElement("span");
+          span.textContent = c;
+          label.appendChild(radio);
+          label.appendChild(span);
+          fs.appendChild(label);
+        });
+        li.appendChild(fs);
+      } else {
+        var label2 = document.createElement("label");
+        label2.className = "qtext";
+        label2.htmlFor = "a" + i;
+        label2.style.display = "block";
+        label2.appendChild(num);
+        label2.appendChild(document.createTextNode(it.q.q));
+        var input = document.createElement("input");
+        input.type = "text";
+        input.id = "a" + i;
+        input.autocomplete = "off";
+        input.setAttribute("autocapitalize", "off");
+        input.setAttribute("spellcheck", "false");
+        li.appendChild(label2);
+        li.appendChild(input);
+      }
+      it.li = li;
+      list.appendChild(li);
+    });
+  }
+
+  function grade() {
+    var score = 0, forgivenCount = 0, wrong = [];
+    items.forEach(function (it, i) {
+      var q = it.q, mine = "", correct = "", right = false, exact = true;
+      if (q.type === "mc") {
+        var picked = form.querySelector('input[name="q' + i + '"]:checked');
+        mine = picked ? it.choices[Number(picked.value)] : "";
+        correct = q.correct;
+        right = mine === q.correct;
+      } else {
+        mine = document.getElementById("a" + i).value.trim();
+        correct = q.answers[0];
+        var res = checkText(mine, q.answers);
+        right = res.ok;
+        exact = res.exact;
+      }
+      if (right) {
+        score++;
+        if (!exact) forgivenCount++;
+      } else {
+        wrong.push({ n: i + 1, q: q.q, typed: mine, correct: correct });
+      }
+    });
+    return { score: score, total: items.length, forgiven: forgivenCount, wrong: wrong };
+  }
+
+  function add(parent, tag, text, cls) {
+    var el = document.createElement(tag);
+    if (cls) el.className = cls;
+    el.textContent = text;
+    parent.appendChild(el);
+    return el;
+  }
+
+  function showResult(r, name, sent) {
+    var pct = Math.round((r.score / r.total) * 100);
+    resultBox.hidden = false;
+    resultBox.innerHTML = "";
+    add(resultBox, "h2", name ? "Resulta ni " + name : "Resulta");
+    add(resultBox, "p", r.score + " / " + r.total + " (" + pct + "%)", "score");
+    if (r.forgiven) add(resultBox, "p", r.forgiven + " sagot ang tinanggap kahit may typo.");
+
+    add(resultBox, "h3", "Mga maling sagot");
+    if (!r.wrong.length) {
+      add(resultBox, "p", "Wala kang mali. Perfect!");
+    } else {
+      var ul = document.createElement("ul");
+      ul.className = "wrong-list";
+      r.wrong.forEach(function (w) {
+        var li = document.createElement("li");
+        add(li, "p", w.n + ". " + w.q, "wq");
+        add(li, "p", "Sagot mo: " + (w.typed || "(walang sagot)"), "wmine");
+        add(li, "p", "Tamang sagot: " + w.correct, "wright");
+        ul.appendChild(li);
+      });
+      resultBox.appendChild(ul);
+    }
+
+    add(resultBox, "p", "Yeyyy good job! If you got a low score that's okay! There's plenty of time to review.", "goodjob");
+    if (sent === false) {
+      add(resultBox, "p", "Hindi naipadala ang score. Mag-screenshot ng resulta at ipakita sa teacher.", "small");
+    }
+
+    var back = document.createElement("a");
+    back.className = "btn";
+    back.href = "index.html";
+    back.textContent = "Back to index";
+    resultBox.appendChild(back);
+
+    resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
+    resultBox.focus({ preventScroll: true });
+  }
+
+  function sendScore(payload) {
+    if (!SCORE_URL) return Promise.resolve(null);
+    return fetch(SCORE_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    }).then(function () { return true; }, function () { return false; });
+  }
+
+  // The button uses a plain click, so it also works where the page is not allowed to submit forms
+  form.addEventListener("submit", function (e) { e.preventDefault(); });
+  submitBtn.addEventListener("click", function () {
+    if (submitted) return;
+    var nameEl = document.getElementById("name");
+    var name = nameEl.value.trim();
+    if (!name) {
+      msg.textContent = "Ilagay muna ang pangalan mo bago mag-submit.";
+      nameEl.focus();
+      return;
+    }
+    msg.textContent = "";
+    submitted = true;
+    submitBtn.disabled = true;
+    var r = grade();
+    document.getElementById("quizArea").hidden = true;
+    showResult(r, name, null);
+    sendScore({
+      time: new Date().toISOString(),
+      name: name,
+      quiz: QUIZ_NAME,
+      score: r.score,
+      total: r.total,
+      percent: Math.round((r.score / r.total) * 100),
+      forgiven: r.forgiven
+    }).then(function (sent) { showResult(r, name, sent); });
+  });
+
+  build();
+</script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AP Reviewer</title>
+<style>
+  /* Layout: single plain column, header, one straight rule, then the reviewer content below. */
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --rule: #1a1a1a;
+    --muted: #6b6b6b;
+    --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121212;
+      --fg: #f0f0f0;
+      --rule: #f0f0f0;
+      --muted: #9a9a9a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121212;
+    --fg: #f0f0f0;
+    --rule: #f0f0f0;
+    --muted: #9a9a9a;
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    padding-inline: 1rem;
+    padding-block: 2.5rem 4rem;
+  }
+
+  main {
+    max-width: 46rem;
+    margin-inline: auto;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 5vw, 2.25rem);
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  hr {
+    border: 0;
+    border-top: 2px solid var(--rule);
+    margin: 1rem 0 1.5rem;
+  }
+
+  .reviewer {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+  }
+
+  main { padding-bottom: 5rem; }
+
+  /* "Head back?" button */
+  .back {
+    display: inline-block;
+    margin-top: 3rem;
+    padding: 0.7rem 1.4rem;
+    border: 2px solid var(--rule);
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .back:hover, .back:focus-visible {
+    background: var(--fg);
+    color: var(--bg);
+    outline: none;
+  }
+
+  /* Leaf music button, bottom right */
+  .leaf {
+    position: fixed;
+    right: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    width: 3.5rem;
+    height: 3.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    opacity: 0.65;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .leaf:hover, .leaf.playing { opacity: 0.9; }
+  .leaf:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; border-radius: 50%; }
+  .leaf img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: spin 4s linear infinite;
+    animation-play-state: paused;
+  }
+  .leaf.playing img { animation-play-state: running; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap">
+</head>
+<body>
+<main>
+  <h1>AP Reviewer (Topic 1 and 2)</h1>
+  <hr>
+  <section class="reviewer" id="reviewer">TOPIC ONE
+⛰️Isyung teritoryal:
+•International Law at Domestic Law•UNCLOS, Territorial sea at EEZ
+•Permanent Court of Arbitration at Hague ruling
+
+📝NOTES:
+Hague ay matatagpuan sa *Netherlands*
+→ Iran old name ay PERSIA
+→Noon ang china ay tawag na sleeping giant.
+*Mga Sinaunang Sibilisasyon.*
+•Babelonia
+•Roman
+•Greek (Macedonian)
+•Perisan
+
+✨Abbrevations:
+UNCLOS = UNITED NATIONS CONVENTION ON THE LAW OF THE SEA
+EEZ = EXCLUSIVE ECONOMIC ZONE
+PCA = PERMANENT COURT OF ARBITRATION
+
+❗Dahilan ng people power ay = SNAP ELECTION (isang biglaan o mas maagang halalan na idinaraos bago sumapit ang opisyal o regular na iskedyul ng eleksyon.)
+
+❗Ang nagtatag sa MARTIAL LAW ay si FERDINAND MARCOS SR.
+
+Question: 17th parallel na dating naghati sa Hilaga at TImog Vietnam
+Answer: ✨*Geometrik:* Gumagamit ng tuwid na linya o latitude
+
+‼️•Ekwador = hinahati ang Hilaga at Timog
+
+•Prime Meridian = hinahati ang Kanluran (lumulubog ang araw) at Silangan (sumisikat ang araw)
+
+•Longitude = patayong guhit (vertical lines) na nagmumula sa North Pole patungong South Pole.
+
+•Latitude = pahigang guhit (horizontal) na paikot sa Daigdig.
+
+•Hindi tuwid na linya = INTERNATIONAL DATE LINE
+
+Question: Ural mountain na naghahati sa Asya at Europa
+Answer :✨*Pisikal:* Bundok, ilog at dagat
+
+Question: Mapa na nagpapakita ng legal na hangganan ng mga bansa
+Answer: ✨*Pulitikal:* Legal na hangganan ng mga estado
+
+📝 Estado= isang malayang bansa
+
+Question: Mapa na nagpapakita ng mga wikang sinasalita/ginagawa sa isang rehiyon
+Answer: ✨*Kultural:* Batay sa wika, relihiyon o tradisyon
+
+‼️INTERNATIONAL LAW - Mga tuntunin at kasunduang gumagabay sa ugnayan ng mga bansa.
+
+❗ESTADO:
+1. Tao - Pinakamahalaga
+2. Teritoryo
+3. Pamahalaan
+4. Soberanya (Sariling batas)
+
+‼️ DOMESTIC LAW AND ORDINASA AY HINDI MAG KAPAREHAS
+
+‼️DOMESTIC LAW - Mga batas na umiiral sa loob ng isang bansa
+Halimbawa:
+•1987 Philippine Constitution - ‼️ Saligang batas ngayon ng pilipinas
+•Republic Acts
+•Lokal na ordinansa
+
+*IMPORTANTE LALABAS ITO SA QUIZ!!*
+
+1st Republic: Emilio Aguinaldo (Malolos Republic)
+
+2nd Republic: Jose P. Laurel (Panahon ng Hapon)
+
+3rd Republic: Manuel Roxas - Namatay sa atake sa puso
+
+4th Republic: Ferdinand E. (Edralin) Marcos Sr. (Bagong Lipunan)
+
+5th Republic: Corazon Aquino - kauna-unahang pangulong babae ng pilipinas also, Ina Ng demokrasya
+
+1st commonwealth president: MANUEL QUEZON  ang sumunod ay si SERGIO OSMEÑA
+
+→ Si Benigno "Noynoy" Aquino III  ang nagpatupad na bawal ang "wang-wang" sa mga police cars.
+
+‼️Nasa 5th republic ang pilipinas ngayon
+
+‼️UNCLOS (UNITED NATIONS CONVENTION ON THE LAW OF THE SEA) - pandaigdigang kasunduan na nagtatakda ng mga patakaran sa:
+•Paggamit ng karagatan
+•maritime zones
+•likas na yaman at.
+•mapayapang pagresolba ng alitan.
+
+→ "Pinagtibay at binuksan para sa paglagda ang UNCLOS noong *1982* at nakabisa noong *1994*"
+
+‼️TERRITORIAL SEA - Tubig na umaabot nang hanggang 12 nautical miles (katumbas ng humigit-kumulang 22 kilometro)
+
+Halimbawa: Maaring ipatupad ng pilipinas ang mga batas nito sa loob ng territorial sea.
+
+‼️EXCLUSIVE ECONOMIC ZONE (EEZ) - Umaabot nang hanggang 200 nautical miles (tinatayang 370 kilometro) mula sa baseline.
+
+→"eksklusibong karapatan na pakinabangan at pamahalaan ang lahat ng likas na yaman "
+
+‼️ARBITRATION - Mapayapang pagresolba sa alitan sa pamamagitan ng isang impartial tribunal.
+Halimbawa: Naghain ang Pilipinas ng kaso sa ilalim ng UNCLOS upang malinawan ang ilang legal na usapin sa South China sea
+
+❗Noon ang china ay tawag na sleeping giant.
+
+‼️PERMANENT COURT OF ARBITRATION (PCA) - Institusyong nagbibigay ng administrative at registry support sa ilang bansa
+
+‼️✨NANALO ANG PILIPINAS SA ARBITRATION !!!
+
+TOPIC 2 #1
+🏝️Highly contested na teritoryo:•Spartly Islands, (KALAYAAN GROUP OF ISLANDS)
+•Paracek Islands,
+•Scarborough shoal,
+•at mga bahaging malapit sa palawan.
+
+"Ang EEZ ng bawat bansa ay hanggang 200 nautical miles mula sa kanilang baybayin"
+
+‼️Presidente na nag claim/nagsabi na atin ang Spartly = FERDINAND E. MARCOS SR.
+
+❗Presidente na naghabol sa SABAH malaysia = Diosdado Macapagal (Full name: Diosdado Pangan Macapagal.)
+
+📌Rason kung bakit kini-claim ng china ang kalaayan group of islands = Ang history daw nila ay, sila ang unang nakakita kaya kanila daw ito.
+
+📊INVESTMENT O PAMUMUHUNAN
+►Paggamit ng salapi, kagamitan o kapital upang makapagtayo o mapalawak ang negosyo
+
+📈TWO TYPES
+
+1.) FOREIGN INVESTEMENT (kumpanya)
+→Pamumuhunan na nagmumula sa isang tao o kumpanyang mula sa ibang bansa:
+
+❗AMBAG:
+•Kapital
+•Trabaho
+•Teknolohiya
+•Bagong kasanayan
+
+✧ Halimbawa: Isang dayuhang kumpanya ang nagtatayo ng manufacturing plant sa pilipinas
+
+2.) FOREIGN INVESTOR (Tao)
+→Dayuhang indibidwal o kumpanyang namumuhunan sa isang bansa.
+
+✧ Halimbawa: Isang kumpanyang mula sa isang bansa ang nakikipag partnership sa isang lokal na negosyo.
+
+‼️MSME (Micro, Small and Medium Enterprises)
+→Maliliit at katamtamang laki ng negosyo na mahalaga sa trabaho at kabuhayan.
+✧ Halimbawa:
+•Pasahod
+•Kaligtasan
+•Pagmamay-ari
+•Buwis
+•Pangangalaga sa likas-yaman
+
+📝Ang mga tindahan, kagaya nalang ng mga sari sari store ay kailangan ng BUSINESS PERMIT. Nabanggit din ni sir ang BIR o Bureau of Internal Revenue. Ang ahensya ng pamahalaan na sila ang may hawak ng BIR ay, DOF o Department of Finance.
+
+‼️REPUBLIC ACT NO 11647
+An act promoting foreign investments amending thereby "foreign investments act of 1991" as amended and other puposes.
+→Natalakay na ito nung term 1 so basically, RA 11647 is,,, batas na naglalayong hikayatin ang mas maraming dayuhang pamumuhunan sa pilipinas sa pamamagitan ng pag-amyenda sa foreign investment act of 1991.
+
+‼️PILIPINO FIRST POLICY - presidente na nag tatag: CARLOS P. GARCIA
+
+TOPIC 2 #2
+🏃Stereotype ay ang pangkalahatan at permanenteng paniniwala o impresyon sa isang pangkat ng mga tao base sa kanilang lahi, kasarian, edad, o pinagmulan, nang hindi isinasaalang-alang ang kanilang indibidwal na pagkakaiba.
+
+‼️PANANAW TUNGKOL SA BABAE AT LALAKI
+•Pamilya
+•Paaralan
+•Media
+•Kultura
+
+♀️♂️SEX:
+►Ang tumutukoy sa pisikal na katangian ng isang tao ukol sa kanyang pagkababae o pagkalalaki
+
+🏳️‍🌈GENDER:
+►Ito ay isang sosyal at kultural na konstruksyon na tumutukoy sa pananaw ng isang tao ukol sa kaniyang kasarian.
+
+🚓GENDER ROLES
+►Ito ay tumutukoy sa mga inaasahang ugali, gawi, galaw at responsibilidad ng tao ayon sa kanyang lipunang ginagalawan.
+
+📚DALAWANG TEORYA
+1.) Social Learning Theory (Pagkikihalobilo)
+→Ipinapaliwanag na maaaring matutuhan ang gender roles sa pamamagitan ng:
+•pagmamasid
+•paggaya
+•pagtanggap ng papwi o puna
+
+2.) Evolutionary psychology
+Isang pananaw na iniuugnay ang ilang tradisyon na gender roles sa gawain at kondisyong nabuo sa mahabang panahon ng ebolusyon ng tao.</section>
+
+  <a class="back" href="index.html">Head back?</a>
+</main>
+
+<audio id="music" src="assets/new%20leaf.mp3" loop preload="none"></audio>
+<button class="leaf" id="leaf" type="button" aria-label="Play music" aria-pressed="false">
+  <img src="assets/leaf.png" alt="">
+</button>
+
+<script>
+  var audio = document.getElementById("music");
+  var leaf = document.getElementById("leaf");
+
+  function setPlaying(on) {
+    leaf.classList.toggle("playing", on);
+    leaf.setAttribute("aria-pressed", on ? "true" : "false");
+    leaf.setAttribute("aria-label", on ? "Stop music" : "Play music");
+  }
+
+  function stopMusic() {
+    audio.pause();
+    audio.currentTime = 0;
+    setPlaying(false);
+  }
+
+  leaf.addEventListener("click", function () {
+    if (audio.paused) {
+      var p = audio.play();
+      setPlaying(true);
+      if (p && p.catch) p.catch(function () { setPlaying(false); });
+    } else {
+      stopMusic();
+    }
+  });
+
+  // Stop the music when the visitor leaves the page or switches away from it
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) stopMusic();
+  });
+  window.addEventListener("pagehide", stopMusic);
+</script>
+</body>
+</html>
