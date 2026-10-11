@@ -313,7 +313,15 @@ Isang pananaw na iniuugnay ang ilang tradisyon na gender roles sa gawain at kond
   <a class="back" href="index.html">Head back?</a>
 </main>
 
-<audio id="music" src="assets/new%20leaf.mp3" loop preload="none"></audio>
+<!-- The browser uses the first file name that exists in the assets folder -->
+<audio id="music" loop preload="none">
+  <source src="assets/new%20leaf.mp3" type="audio/mpeg">
+  <source src="assets/new-leaf.mp3" type="audio/mpeg">
+  <source src="assets/new_leaf.mp3" type="audio/mpeg">
+  <source src="assets/newleaf.mp3" type="audio/mpeg">
+  <source src="assets/New%20Leaf.mp3" type="audio/mpeg">
+  <source src="assets/New%20leaf.mp3" type="audio/mpeg">
+</audio>
 <button class="leaf" id="leaf" type="button" aria-label="Play music" aria-pressed="false">
   <img src="assets/leaf.png" alt="">
 </button>
@@ -322,7 +330,10 @@ Isang pananaw na iniuugnay ang ilang tradisyon na gender roles sa gawain at kond
   var audio = document.getElementById("music");
   var leaf = document.getElementById("leaf");
 
+  var isOn = false;
+
   function setPlaying(on) {
+    isOn = on;
     leaf.classList.toggle("playing", on);
     leaf.setAttribute("aria-pressed", on ? "true" : "false");
     leaf.setAttribute("aria-label", on ? "Stop music" : "Play music");
@@ -334,15 +345,25 @@ Isang pananaw na iniuugnay ang ilang tradisyon na gender roles sa gawain at kond
     setPlaying(false);
   }
 
+  // The leaf keeps spinning while it is switched on, even if the music file is missing
   leaf.addEventListener("click", function () {
-    if (audio.paused) {
-      var p = audio.play();
-      setPlaying(true);
-      if (p && p.catch) p.catch(function () { setPlaying(false); });
-    } else {
+    if (isOn) {
       stopMusic();
+      return;
+    }
+    setPlaying(true);
+    var p = audio.play();
+    if (p && p.catch) {
+      p.catch(function () {
+        console.warn("The music could not play. Check the file name inside the assets folder.");
+      });
     }
   });
+
+  // If a file name is wrong, the browser console shows which one it tried
+  audio.addEventListener("error", function (e) {
+    console.warn("Could not load:", e.target.src);
+  }, true);
 
   // Stop the music when the visitor leaves the page or switches away from it
   document.addEventListener("visibilitychange", function () {
