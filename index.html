@@ -65,6 +65,17 @@
     }
 
     /* Full-screen fade used when leaving for another page */
+.screen { overflow: hidden; }
+.screen::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  background: var(--fill) center / 100% 100% no-repeat;
+  filter: blur(14px) brightness(.85) saturate(1.1);
+}
+#outside { --fill: url("assets/ext-bg.png"); }
+#inside  { --fill: url("assets/ing-bg.png"); }
+.stage { z-index: 1; }
     #fade {
       position: fixed;
       inset: 0;
