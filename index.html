@@ -944,12 +944,11 @@
     $('aral-order').addEventListener('click', () => openWin(orderWin));
     $('order-complete').addEventListener('click', () => openWin(quizWin));
     $('quiz-yes').addEventListener('click', () => {
-      closeWin(quizWin);
-      if (GOOGLE_FORM_URL) window.open(GOOGLE_FORM_URL, '_blank', 'noopener');
-      else console.warn('GOOGLE_FORM_URL is empty: paste your Google Form link at the top of the script.');
+    closeWin(quizWin);
+      goTo('quizAp.html');
     });
     $('quiz-no').addEventListener('click', () => closeWin(quizWin));
-
+    
     const codeInput = $('code-input');
     const codeMsg   = $('code-msg');
     let checking = false;
