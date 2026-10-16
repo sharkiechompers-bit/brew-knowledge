@@ -45,8 +45,7 @@
       transition: opacity .6s ease;
     }
 
-    /* Keeps each screen's artwork at its original proportions so
-       everything lines up on phones and desktops alike. */
+    /* Keeps each screen's artwork at its original proportions */
     .stage {
       position: relative;
       aspect-ratio: var(--w) / var(--h);
@@ -97,12 +96,12 @@
     }
     .door.knocking { animation: knock .18s ease-in-out 4; }
 
-    /* Storybook button with a one-time intro bounce */
+    /* Storybook button positioned precisely matching visual (bottom right area on exterior) */
     .storybook-btn {
       position: absolute;
       left: 52%;
-      top: 73%;
-      width: 35%;
+      top: 68%;
+      width: 36%;
       background: none;
       border: 0;
       padding: 0;
@@ -161,14 +160,13 @@
     .item:active,
     .item.poke { transform: scale(.95); }
 
-    /* Positions are percentages of the 707 x 1000 inside artwork */
     .logo   { left: 2%;    top: 4%;    width: 40%;   }
     .menu   { left: 19%;   top: 37%;   width: 20%;   }
     .coffee { left: 64%;   top: 47.5%; width: 15.5%; }
     .gourdy { left: .7%;   top: 73%;   width: 26%;   }
     .disk   { left: 70.5%; top: 78%;   width: 25.5%; }
 
-    /* ---------- Pink windows (Welcome + Menu) ---------- */
+    /* ---------- Pink windows ---------- */
     .window {
       position: absolute;
       z-index: 10;
@@ -253,7 +251,7 @@
       overflow: hidden;
     }
 
-    /* Welcome */
+    /* Welcome Window */
     .window-body h1 { margin: 0; font-size: 9cqw; font-weight: 400; }
     .window-body > img { width: 54%; height: auto; }
     .window-body > p {
@@ -263,21 +261,21 @@
       letter-spacing: .25cqw;
     }
 
-    /* Stories / Ap Filming Popup Body Style */
+    /* Stories / Ap Filming Popup Body Style - Fixed alignment and button text sizing */
     .stories-body {
       justify-content: flex-start;
       padding-top: 5cqw;
     }
     .stories-body h1 {
-      margin: 0 0 6cqw 0;
-      font-size: 8.5cqw;
+      margin: 0 0 4cqw 0;
+      font-size: 7.5cqw;
       font-weight: 400;
       letter-spacing: .1cqw;
     }
     .stories-body .footer-note {
       margin-top: auto;
       margin-bottom: 2cqw;
-      font-size: 5cqw;
+      font-size: 4.5cqw;
     }
 
     /* ---------- Pixel frame buttons (assets/button.png) ---------- */
@@ -295,16 +293,20 @@
       cursor: pointer;
       transition: transform .12s ease, filter .12s ease;
     }
-    .frame-btn span { display: block; transform: translateY(-.3cqw); }
+    .frame-btn span { 
+      display: block; 
+      transform: translateY(-.3cqw);
+      font-size: 4.2cqw; /* Scaled down to fit properly inside the button frame without overflowing */
+      white-space: nowrap;
+    }
     .frame-btn:hover,
     .frame-btn:focus-visible { transform: translateY(-.6cqw); filter: brightness(1.05); outline: none; }
     .frame-btn:active { transform: scale(.96); }
 
-    .frame-btn.big   { width: 33.5cqw; font-size: 6.2cqw; letter-spacing: .3cqw; }
+    .frame-btn.big   { width: 38cqw; font-size: 4.5cqw; letter-spacing: .1cqw; }
     .frame-btn.small { width: 20.5cqw; font-size: 3.9cqw; }
     .frame-btn.price { width: 22cqw;   font-size: 5.6cqw; }
 
-    /* The crossed-out original price does nothing */
     .frame-btn.old { cursor: default; }
     .frame-btn.old:hover,
     .frame-btn.old:focus-visible { transform: none; filter: none; }
@@ -344,7 +346,6 @@
     }
     .flavors > :last-child { grid-column: 2; }
 
-    /* Locked slots: no behavior at all */
     .locked {
       width: 20.5cqw;
       padding: 0;
@@ -354,7 +355,7 @@
     }
     .locked img { display: block; width: 100%; height: auto; pointer-events: none; }
 
-    /* ---------- Premium pack pop-up (blue window) ---------- */
+    /* ---------- Premium pack pop-up ---------- */
     .win-premium {
       z-index: 20;
       left: 9.9%;
@@ -402,7 +403,7 @@
     }
     .prices { display: flex; justify-content: center; gap: 11cqw; }
 
-    /* ---------- "System message" code prompt (retro dialog) ---------- */
+    /* ---------- Code prompt / Quiz windows ---------- */
     .win-code,
     .win-quiz {
       z-index: 30;
@@ -462,7 +463,7 @@
       font-family: "Itim", "Comic Sans MS", cursive;
       font-size: 6.4cqw;
       letter-spacing: 1.6cqw;
-      text-indent: 1.6cqw; /* balances the trailing letter-spacing */
+      text-indent: 1.6cqw;
       color: #111;
       background: #fff;
       border: .5cqw solid;
@@ -484,13 +485,9 @@
     .win-code { left: 4.7%;  top: 37.2%; width: 91%;   height: 39.3%; }
     .win-quiz { left: 18.4%; top: 32%;   width: 62.5%; height: 27%; }
 
-    /* Window title that is bigger than the default (Menu) */
     .titlebar .lg { font-size: 5.8cqw; }
-
-    /* "Confirmation:" heading in the Coffee windows */
     .menu-body .lead.center { align-self: center; font-size: 6.8cqw; margin-bottom: 3.2cqw; }
 
-    /* ---------- Coffee: toppings step ---------- */
     .order-body { justify-content: flex-start; padding: 2cqw 2.7cqw; }
     .order-body .lead {
       margin: 0;
@@ -512,7 +509,6 @@
       letter-spacing: .3cqw;
     }
 
-    /* ---------- "This is a long quiz" dialog ---------- */
     .code-body.quiz-body { padding: 1cqw 3cqw; }
     .code-body.quiz-body p { font-size: 4.9cqw; }
     .code-body.quiz-body p.big { font-size: 6.4cqw; }
@@ -534,7 +530,6 @@
     }
     .sys-btn:active { border-color: #404040 #fff #fff #404040; }
 
-    /* ---------- Picture pop-ups ---------- */
     .window-body.photo-body { justify-content: flex-start; padding: 5.8cqw 0 0; }
     .window-body.photo-body > img { width: 68cqw; height: auto; image-rendering: auto; }
 
@@ -547,7 +542,6 @@
       letter-spacing: .25cqw;
     }
 
-    /* ---------- Spinning disk ---------- */
     .disk img { animation: spin 3.2s linear infinite; animation-play-state: paused; }
     .disk.playing img { animation-play-state: running; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -568,7 +562,7 @@
       <div class="stage" style="--w:472; --h:839;">
         <img class="bg" src="assets/ext-bg.png" alt="Pixel art storefront of Brew Knowledge" draggable="false">
         
-        <!-- Storybook clickable element with one-time intro bounce -->
+        <!-- Storybook button placed accurately over storefront window graphic -->
         <button id="storybook-trigger" class="storybook-btn" type="button" aria-label="Open stories">
           <img src="assets/storybook.png" alt="" draggable="false">
         </button>
@@ -587,6 +581,7 @@
           </div>
           <div class="window-body stories-body">
             <h1>For Ap Filming!</h1>
+            <!-- Fixed button class/sizing so text fits inside properly -->
             <button type="button" class="frame-btn big" id="sabio-btn"><span>Sabio's Idea</span></button>
             <p class="footer-note">other ideas will be added soon!</p>
           </div>
@@ -803,8 +798,8 @@
     /* ====== Settings you may want to edit ====== */
     const PREMIUM_CODE = '1006';
     const SUBJECT_PAGES = { English: 'English.html', Math: 'Math.html', Science: 'Science.html' };
-    const REVIEW_PAGE  = 'reveiwAp.html';   // Aral Pan destination (spelled as you gave it)
-    const GOOGLE_FORM_URL = '';             // paste your Google Form link here
+    const REVIEW_PAGE  = 'reveiwAp.html';   
+    const GOOGLE_FORM_URL = '';             
     const FILMING_PAGE = 'filming.html';
 
     const $ = (id) => document.getElementById(id);
@@ -834,7 +829,6 @@
       [premWin,   [codeWin]],
     ]);
 
-    // Only one "main" window at a time (the logo, menu, coffee, gourdy, and stories ones)
     const mainWins = [welcome, menuWin, coffeeWin, bearWin, twistedWin, storiesWin];
     function openMain(win) {
       mainWins.forEach((w) => { if (w !== win && !w.hidden) closeWin(w); });
@@ -844,7 +838,7 @@
     function openWin(win) {
       win.hidden = false;
       win.classList.remove('open');
-      void win.offsetWidth;            // restart the pop animation
+      void win.offsetWidth;            
       win.classList.add('open');
     }
     function closeWin(win) {
@@ -858,12 +852,10 @@
       el.classList.add('shake');
     }
 
-    // Open stories popup when clicking the storybook image
     storybookBtn.addEventListener('click', () => {
       openMain(storiesWin);
     });
 
-    // Take user to filming.html when clicking Sabio's Idea
     sabioBtn.addEventListener('click', () => {
       fade.classList.add('on');
       setTimeout(() => { window.location.href = FILMING_PAGE; }, 600);
@@ -895,12 +887,11 @@
       };
 
       knock.addEventListener('ended', () => setTimeout(proceed, 250), { once: true });
-      setTimeout(proceed, 3000);                       // never get stuck
+      setTimeout(proceed, 3000);                       
       knock.currentTime = 0;
       knock.play().catch(() => setTimeout(proceed, 700));
     });
 
-    /* ====== Window buttons (minimize / maximize / close / X) ====== */
     outside.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-window]');
       if (!btn) return;
@@ -923,7 +914,6 @@
       if (top) closeWin(top);
     });
 
-    /* ====== Premium state ====== */
     const isPremium = () => {
       try { return localStorage.getItem('bk_premium') === '1'; } catch { return false; }
     };
@@ -931,18 +921,15 @@
       try { localStorage.setItem('bk_premium', '1'); } catch { /* ignore */ }
     };
 
-    /* ====== Menu flow ====== */
     function goTo(url) {
       fade.classList.add('on');
       setTimeout(() => { window.location.href = url; }, 600);
     }
 
-    // Freebies: Aral Pan -> another page
     $('aral-pan').addEventListener('click', () => goTo(REVIEW_PAGE));
 
-    let pendingSubject = null;   // subject they tried to open before unlocking
+    let pendingSubject = null;   
 
-    // Premium pack: English / Math / Science
     document.querySelectorAll('[data-subject]').forEach((btn) => {
       btn.addEventListener('click', () => {
         if (isPremium()) {
@@ -954,7 +941,6 @@
       });
     });
 
-    /* ====== Coffee flow ====== */
     $('aral-order').addEventListener('click', () => openWin(orderWin));
     $('order-complete').addEventListener('click', () => openWin(quizWin));
     $('quiz-yes').addEventListener('click', () => {
@@ -1012,7 +998,6 @@
     });
     codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkCode(); });
 
-    /* ====== Click sound ====== */
     const clicky = new Audio('assets/clicky.mp3');
     clicky.preload = 'auto';
     const SFX_SELECTOR = '.item, .frame-btn:not(.old), .sys-btn, [data-window], .storybook-btn';
@@ -1022,7 +1007,6 @@
       snd.play().catch(() => {});
     });
 
-    /* ====== Disk: spin + background music ====== */
     const bgm = new Audio('assets/bg.mp3');
     bgm.loop = true;
     bgm.preload = 'auto';
@@ -1041,7 +1025,6 @@
     document.addEventListener('visibilitychange', () => { if (document.hidden) stopMusic(); });
     window.addEventListener('pagehide', stopMusic);
 
-    /* ====== Inside items ====== */
     const actions = {
       logo()   { openMain(bearWin); },
       menu()   { openMain(menuWin); },
