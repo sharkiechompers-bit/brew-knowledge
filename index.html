@@ -65,17 +65,6 @@
     }
 
     /* Full-screen fade used when leaving for another page */
-.screen { overflow: hidden; }
-.screen::before {
-  content: "";
-  position: absolute;
-  inset: -6%;
-  background: var(--fill) center / 100% 100% no-repeat;
-  filter: blur(14px) brightness(.85) saturate(1.1);
-}
-#outside { --fill: url("assets/ext-bg.png"); }
-#inside  { --fill: url("assets/ing-bg.png"); }
-.stage { z-index: 1; }
     #fade {
       position: fixed;
       inset: 0;
@@ -87,7 +76,7 @@
     }
     #fade.on { opacity: 1; pointer-events: all; }
 
-    /* ---------- Outside: the door ---------- */
+    /* ---------- Outside: the door & storybook ---------- */
     .door {
       position: absolute;
       left: 4%;
@@ -107,6 +96,37 @@
       outline: none;
     }
     .door.knocking { animation: knock .18s ease-in-out 4; }
+
+    /* Storybook button with a one-time intro bounce */
+    .storybook-btn {
+      position: absolute;
+      left: 52%;
+      top: 73%;
+      width: 35%;
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      animation: intro-bounce 0.8s ease 0.3s 1 normal both;
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .storybook-btn img {
+      display: block;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
+    .storybook-btn:hover {
+      transform: translateY(-1.2cqw) scale(1.04);
+      filter: drop-shadow(0 .8cqw 0 rgba(0, 0, 0, .25));
+    }
+
+    @keyframes intro-bounce {
+      0%   { transform: translateY(10cqw) scale(0.8); opacity: 0; }
+      60%  { transform: translateY(-2cqw) scale(1.02); opacity: 1; }
+      80%  { transform: translateY(1cqw) scale(0.98); }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
 
     @keyframes door-hint {
       0%, 100% { box-shadow: 0 0 0 0 rgba(255, 232, 160, 0); }
@@ -241,6 +261,23 @@
       font-size: 6.6cqw;
       line-height: 1.35;
       letter-spacing: .25cqw;
+    }
+
+    /* Stories / Ap Filming Popup Body Style */
+    .stories-body {
+      justify-content: flex-start;
+      padding-top: 5cqw;
+    }
+    .stories-body h1 {
+      margin: 0 0 6cqw 0;
+      font-size: 8.5cqw;
+      font-weight: 400;
+      letter-spacing: .1cqw;
+    }
+    .stories-body .footer-note {
+      margin-top: auto;
+      margin-bottom: 2cqw;
+      font-size: 5cqw;
     }
 
     /* ---------- Pixel frame buttons (assets/button.png) ---------- */
@@ -517,7 +554,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .disk img { animation: none; }
-      .door, .door.knocking, .window.open, .window.shake, #code-input.bad { animation: none; }
+      .door, .door.knocking, .window.open, .window.shake, #code-input.bad, .storybook-btn { animation: none; }
       .screen, .screen.active, #fade { transition-duration: .01s; }
     }
   </style>
@@ -530,7 +567,31 @@
     <section id="outside" class="screen active" aria-label="Outside the cafe">
       <div class="stage" style="--w:472; --h:839;">
         <img class="bg" src="assets/ext-bg.png" alt="Pixel art storefront of Brew Knowledge" draggable="false">
+        
+        <!-- Storybook clickable element with one-time intro bounce -->
+        <button id="storybook-trigger" class="storybook-btn" type="button" aria-label="Open stories">
+          <img src="assets/storybook.png" alt="" draggable="false">
+        </button>
+
         <button id="door" class="door" type="button" aria-label="Knock on the door"></button>
+
+        <!-- STORIES / AP FILMING POP-UP -->
+        <div id="stories-win" class="window win-main" role="dialog" aria-labelledby="stories-title" hidden>
+          <div class="titlebar">
+            <span id="stories-title">&hearts; Stories&hearts;</span>
+            <div class="controls">
+              <button type="button" class="ctl" data-window="close" aria-label="Minimize">&#8211;</button>
+              <button type="button" class="ctl" data-window="max" aria-label="Maximize">&#9633;</button>
+              <button type="button" class="ctl ctl-close" data-window="close" aria-label="Close">&#10005;</button>
+            </div>
+          </div>
+          <div class="window-body stories-body">
+            <h1>For Ap Filming!</h1>
+            <button type="button" class="frame-btn big" id="sabio-btn"><span>Sabio's Idea</span></button>
+            <p class="footer-note">other ideas will be added soon!</p>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -744,6 +805,7 @@
     const SUBJECT_PAGES = { English: 'English.html', Math: 'Math.html', Science: 'Science.html' };
     const REVIEW_PAGE  = 'reveiwAp.html';   // Aral Pan destination (spelled as you gave it)
     const GOOGLE_FORM_URL = '';             // paste your Google Form link here
+    const FILMING_PAGE = 'filming.html';
 
     const $ = (id) => document.getElementById(id);
     const outside = $('outside');
@@ -760,6 +822,10 @@
     const twistedWin = $('twisted-win');
     const fade    = $('fade');
 
+    const storybookBtn = $('storybook-trigger');
+    const storiesWin = $('stories-win');
+    const sabioBtn = $('sabio-btn');
+
     /* ====== Window helpers ====== */
     const children = new Map([
       [menuWin,   [premWin, codeWin]],
@@ -768,8 +834,8 @@
       [premWin,   [codeWin]],
     ]);
 
-    // Only one "main" window at a time (the logo, menu, coffee and gourdy ones)
-    const mainWins = [welcome, menuWin, coffeeWin, bearWin, twistedWin];
+    // Only one "main" window at a time (the logo, menu, coffee, gourdy, and stories ones)
+    const mainWins = [welcome, menuWin, coffeeWin, bearWin, twistedWin, storiesWin];
     function openMain(win) {
       mainWins.forEach((w) => { if (w !== win && !w.hidden) closeWin(w); });
       openWin(win);
@@ -791,6 +857,17 @@
       void el.offsetWidth;
       el.classList.add('shake');
     }
+
+    // Open stories popup when clicking the storybook image
+    storybookBtn.addEventListener('click', () => {
+      openMain(storiesWin);
+    });
+
+    // Take user to filming.html when clicking Sabio's Idea
+    sabioBtn.addEventListener('click', () => {
+      fade.classList.add('on');
+      setTimeout(() => { window.location.href = FILMING_PAGE; }, 600);
+    });
 
     /* ====== Outside -> Inside ====== */
     const knock = new Audio('assets/knock.mp3');
@@ -824,6 +901,14 @@
     });
 
     /* ====== Window buttons (minimize / maximize / close / X) ====== */
+    outside.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-window]');
+      if (!btn) return;
+      const win = btn.closest('.window');
+      if (btn.dataset.window === 'close') closeWin(win);
+      else shakeEl(win);
+    });
+
     inside.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-window]');
       if (!btn) return;
@@ -834,7 +919,7 @@
 
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
-      const top = [codeWin, quizWin, premWin, orderWin, coffeeWin, menuWin, bearWin, twistedWin, welcome].find((w) => !w.hidden);
+      const top = [codeWin, quizWin, premWin, orderWin, coffeeWin, menuWin, bearWin, twistedWin, storiesWin, welcome].find((w) => !w.hidden);
       if (top) closeWin(top);
     });
 
@@ -869,19 +954,16 @@
       });
     });
 
-    // Locked buttons intentionally have no handler.
-
     /* ====== Coffee flow ====== */
-    // Aral Pan -> toppings step -> Complete -> "long quiz" prompt
     $('aral-order').addEventListener('click', () => openWin(orderWin));
     $('order-complete').addEventListener('click', () => openWin(quizWin));
-   $('quiz-yes').addEventListener('click', () => {
-  closeWin(quizWin);
-  goTo('quizAp.html');
+    $('quiz-yes').addEventListener('click', () => {
+      closeWin(quizWin);
+      if (GOOGLE_FORM_URL) window.open(GOOGLE_FORM_URL, '_blank', 'noopener');
+      else console.warn('GOOGLE_FORM_URL is empty: paste your Google Form link at the top of the script.');
     });
     $('quiz-no').addEventListener('click', () => closeWin(quizWin));
 
-    // PHP 40 -> code prompt  (PHP 50 intentionally does nothing)
     const codeInput = $('code-input');
     const codeMsg   = $('code-msg');
     let checking = false;
@@ -931,14 +1013,12 @@
     codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkCode(); });
 
     /* ====== Click sound ====== */
-    // Plays on buttons that do something. Skipped: the door (it has the knock),
-    // the locked buttons, and the crossed-out PHP 50.
     const clicky = new Audio('assets/clicky.mp3');
     clicky.preload = 'auto';
-    const SFX_SELECTOR = '.item, .frame-btn:not(.old), .sys-btn, [data-window]';
+    const SFX_SELECTOR = '.item, .frame-btn:not(.old), .sys-btn, [data-window], .storybook-btn';
     document.addEventListener('click', (e) => {
       if (!e.target.closest(SFX_SELECTOR)) return;
-      const snd = clicky.cloneNode();          // clone so fast clicks can overlap
+      const snd = clicky.cloneNode();
       snd.play().catch(() => {});
     });
 
@@ -958,7 +1038,6 @@
         stopMusic();
       }
     }
-    // Leaving the tab or page stops the music
     document.addEventListener('visibilitychange', () => { if (document.hidden) stopMusic(); });
     window.addEventListener('pagehide', stopMusic);
 
@@ -970,9 +1049,7 @@
       gourdy() { openMain(twistedWin); },
       disk()   { toggleMusic(); },
 
-      // After a correct code, English / Math / Science call this:
       subject(name) { goTo(SUBJECT_PAGES[name]); },
-      // Right after a correct code, go to the subject they originally clicked
       premiumUnlocked() { if (pendingSubject) actions.subject(pendingSubject); },
     };
 
