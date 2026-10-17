@@ -272,6 +272,9 @@
       font-weight: 400;
       letter-spacing: .1cqw;
     }
+    .stories-body .frame-btn.big {
+      margin-bottom: 2cqw;
+    }
     .stories-body .footer-note {
       margin-top: auto;
       margin-bottom: 2cqw;
@@ -583,6 +586,7 @@
             <h1>For Ap Filming!</h1>
             <!-- Fixed button class/sizing so text fits inside properly -->
             <button type="button" class="frame-btn big" id="sabio-btn"><span>Sabio's Idea</span></button>
+            <button type="button" class="frame-btn big" id="lamina-btn"><span>Lamina's Idea</span></button>
             <p class="footer-note">other ideas will be added soon!</p>
           </div>
         </div>
@@ -800,7 +804,8 @@
     const SUBJECT_PAGES = { English: 'English.html', Math: 'Math.html', Science: 'Science.html' };
     const REVIEW_PAGE  = 'reveiwAp.html';   
     const GOOGLE_FORM_URL = '';             
-    const FILMING_PAGE = 'filming.html';
+    const FILMING_PAGE = 'filming.html
+    const LAMINA_PAGE = 'meez.html';
 
     const $ = (id) => document.getElementById(id);
     const outside = $('outside');
@@ -820,6 +825,7 @@
     const storybookBtn = $('storybook-trigger');
     const storiesWin = $('stories-win');
     const sabioBtn = $('sabio-btn');
+    const laminaBtn = $('lamina-btn');
 
     /* ====== Window helpers ====== */
     const children = new Map([
@@ -859,6 +865,11 @@
     sabioBtn.addEventListener('click', () => {
       fade.classList.add('on');
       setTimeout(() => { window.location.href = FILMING_PAGE; }, 600);
+    });
+
+    laminaBtn.addEventListener('click', () => {
+      fade.classList.add('on');
+      setTimeout(() => { window.location.href = LAMINA_PAGE; }, 600);
     });
 
     /* ====== Outside -> Inside ====== */
