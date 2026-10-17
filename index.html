@@ -45,7 +45,6 @@
       transition: opacity .6s ease;
     }
 
-    /* Keeps each screen's artwork at its original proportions */
     .stage {
       position: relative;
       aspect-ratio: var(--w) / var(--h);
@@ -63,7 +62,6 @@
       display: block;
     }
 
-    /* Full-screen fade used when leaving for another page */
     #fade {
       position: fixed;
       inset: 0;
@@ -75,7 +73,6 @@
     }
     #fade.on { opacity: 1; pointer-events: all; }
 
-    /* ---------- Outside: the door & storybook ---------- */
     .door {
       position: absolute;
       left: 4%;
@@ -96,7 +93,6 @@
     }
     .door.knocking { animation: knock .18s ease-in-out 4; }
 
-    /* Storybook button positioned precisely matching visual (bottom right area on exterior) */
     .storybook-btn {
       position: absolute;
       left: 52%;
@@ -136,7 +132,6 @@
       50%      { transform: translateX(.5cqw); }
     }
 
-    /* ---------- Inside: clickable items ---------- */
     .item {
       position: absolute;
       padding: 0;
@@ -166,7 +161,6 @@
     .gourdy { left: .7%;   top: 73%;   width: 26%;   }
     .disk   { left: 70.5%; top: 78%;   width: 25.5%; }
 
-    /* ---------- Pink windows ---------- */
     .window {
       position: absolute;
       z-index: 10;
@@ -251,7 +245,6 @@
       overflow: hidden;
     }
 
-    /* Welcome Window */
     .window-body h1 { margin: 0; font-size: 9cqw; font-weight: 400; }
     .window-body > img { width: 54%; height: auto; }
     .window-body > p {
@@ -261,7 +254,6 @@
       letter-spacing: .25cqw;
     }
 
-    /* Stories / Ap Filming Popup Body Style - Fixed alignment and button text sizing */
     .stories-body {
       justify-content: flex-start;
       padding-top: 5cqw;
@@ -281,7 +273,6 @@
       font-size: 4.5cqw;
     }
 
-    /* ---------- Pixel frame buttons (assets/button.png) ---------- */
     .frame-btn {
       border: 0;
       padding: 0;
@@ -299,7 +290,7 @@
     .frame-btn span { 
       display: block; 
       transform: translateY(-.3cqw);
-      font-size: 4.2cqw; /* Scaled down to fit properly inside the button frame without overflowing */
+      font-size: 4.2cqw;
       white-space: nowrap;
     }
     .frame-btn:hover,
@@ -319,7 +310,6 @@
       text-decoration-thickness: .5cqw;
     }
 
-    /* ---------- Menu window ---------- */
     .menu-body {
       justify-content: flex-start;
       padding: 2cqw 2.7cqw;
@@ -358,7 +348,6 @@
     }
     .locked img { display: block; width: 100%; height: auto; pointer-events: none; }
 
-    /* ---------- Premium pack pop-up ---------- */
     .win-premium {
       z-index: 20;
       left: 9.9%;
@@ -406,7 +395,6 @@
     }
     .prices { display: flex; justify-content: center; gap: 11cqw; }
 
-    /* ---------- Code prompt / Quiz windows ---------- */
     .win-code,
     .win-quiz {
       z-index: 30;
@@ -565,14 +553,12 @@
       <div class="stage" style="--w:472; --h:839;">
         <img class="bg" src="assets/ext-bg.png" alt="Pixel art storefront of Brew Knowledge" draggable="false">
         
-        <!-- Storybook button placed accurately over storefront window graphic -->
         <button id="storybook-trigger" class="storybook-btn" type="button" aria-label="Open stories">
           <img src="assets/storybook.png" alt="" draggable="false">
         </button>
 
         <button id="door" class="door" type="button" aria-label="Knock on the door"></button>
 
-        <!-- STORIES / AP FILMING POP-UP -->
         <div id="stories-win" class="window win-main" role="dialog" aria-labelledby="stories-title" hidden>
           <div class="titlebar">
             <span id="stories-title">&hearts; Stories&hearts;</span>
@@ -584,7 +570,6 @@
           </div>
           <div class="window-body stories-body">
             <h1>For Ap Filming!</h1>
-            <!-- Fixed button class/sizing so text fits inside properly -->
             <button type="button" class="frame-btn big" id="sabio-btn"><span>Sabio's Idea</span></button>
             <button type="button" class="frame-btn big" id="lamina-btn"><span>Lamina's Idea</span></button>
             <p class="footer-note">other ideas will be added soon!</p>
@@ -615,7 +600,6 @@
           <img src="assets/disk.png" alt="" draggable="false">
         </button>
 
-        <!-- WELCOME POP-UP -->
         <div id="welcome" class="window win-main" role="dialog" aria-labelledby="welcome-title" hidden>
           <div class="titlebar">
             <span id="welcome-title">&hearts; Welcome</span>
@@ -632,7 +616,6 @@
           </div>
         </div>
 
-        <!-- MENU POP-UP -->
         <div id="menu-win" class="window win-main" role="dialog" aria-labelledby="menu-title" hidden>
           <div class="titlebar">
             <span id="menu-title" class="lg">&hearts; Menu</span>
@@ -661,7 +644,6 @@
           </div>
         </div>
 
-        <!-- COFFEE ORDER POP-UP -->
         <div id="coffee-win" class="window win-main" role="dialog" aria-labelledby="coffee-title" hidden>
           <div class="titlebar">
             <span id="coffee-title">&hearts;Order up!</span>
@@ -690,7 +672,6 @@
           </div>
         </div>
 
-        <!-- COFFEE ORDER: TOPPINGS STEP -->
         <div id="order-win" class="window win-main" role="dialog" aria-labelledby="order-title" hidden>
           <div class="titlebar">
             <span id="order-title">&hearts;Order up!</span>
@@ -707,7 +688,6 @@
           </div>
         </div>
 
-        <!-- LOGO: CAFE BEAR PICTURE ONLY -->
         <div id="bear-win" class="window win-main" role="dialog" aria-label="Cafe bear" hidden>
           <div class="titlebar">
             <span aria-hidden="true">&hearts;</span>
@@ -722,7 +702,6 @@
           </div>
         </div>
 
-        <!-- GOURDY: WORK IN PROGRESS -->
         <div id="twisted-win" class="window win-main" role="dialog" aria-labelledby="twisted-title" hidden>
           <div class="titlebar">
             <span id="twisted-title">&hearts; Sorry!</span>
@@ -738,7 +717,6 @@
           </div>
         </div>
 
-        <!-- PREMIUM PACK POP-UP -->
         <div id="premium-win" class="window win-premium" role="dialog" aria-labelledby="premium-title" hidden>
           <div class="titlebar">
             <span id="premium-title" aria-label="Premium pack">&hearts;</span>
@@ -760,7 +738,6 @@
           </div>
         </div>
 
-        <!-- QUIZ CONFIRMATION -->
         <div id="quiz-win" class="window win-quiz" role="alertdialog" aria-labelledby="quiz-title" hidden>
           <div class="code-title">
             <span id="quiz-title">System message</span>
@@ -776,7 +753,6 @@
           </div>
         </div>
 
-        <!-- CODE PROMPT -->
         <div id="code-win" class="window win-code" role="dialog" aria-labelledby="code-title" hidden>
           <div class="code-title">
             <span id="code-title">System message</span>
@@ -799,7 +775,6 @@
 
   <script>
   (() => {
-    /* ====== Settings you may want to edit ====== */
     const PREMIUM_CODE = '1006';
     const SUBJECT_PAGES = { English: 'English.html', Math: 'Math.html', Science: 'Science.html' };
     const REVIEW_PAGE  = 'reveiwAp.html';   
@@ -827,7 +802,6 @@
     const sabioBtn = $('sabio-btn');
     const laminaBtn = $('lamina-btn');
 
-    /* ====== Window helpers ====== */
     const children = new Map([
       [menuWin,   [premWin, codeWin]],
       [coffeeWin, [orderWin, quizWin, premWin, codeWin]],
@@ -872,7 +846,6 @@
       setTimeout(() => { window.location.href = LAMINA_PAGE; }, 600);
     });
 
-    /* ====== Outside -> Inside ====== */
     const knock = new Audio('assets/knock.mp3');
     knock.preload = 'auto';
     let entering = false;
@@ -955,7 +928,7 @@
     $('aral-order').addEventListener('click', () => openWin(orderWin));
     $('order-complete').addEventListener('click', () => openWin(quizWin));
     $('quiz-yes').addEventListener('click', () => {
-    closeWin(quizWin);
+      closeWin(quizWin);
       goTo('quizAp.html');
     });
     $('quiz-no').addEventListener('click', () => closeWin(quizWin));
